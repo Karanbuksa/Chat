@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <File name="Messages" fileName="src/main/java/server/log.txt" append="true">
+            <PatternLayout pattern="%d{dd-MM-yyyy HH:mm:ss} - %msg%n"/>
+        </File>
+        <File name="Info" fileName="src/main/java/server/info.txt" append="false">
+            <PatternLayout pattern="%d{dd-MM-yyyy HH:mm:ss} - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Logger level="trace">
+            <AppenderRef ref="Messages"/>
+        </Logger>
+        <Logger level="info">
+            <AppenderRef ref="Info"/>
+        </Logger>
+    </Loggers>
+</Configuration>
