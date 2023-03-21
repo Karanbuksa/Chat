@@ -1,7 +1,5 @@
-[
-  {
-    "host": "127.0.0.1",
-    "port": 8656,
-    "token": null
-  }
-]
+{
+  "port": 8656,
+  "host": "127.0.0.1",
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0QG1haWwuY29tIn0.4micWbzOlPkdf6U8FG8bsIFI4pRpVFkiylgAGuiipbI1KutGCwFJfN6XY19usf_pKqGuxRHR3WWy7FBN4_XxXQ"
+}

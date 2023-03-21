@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import server.tasks.User;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -43,12 +44,14 @@ public class Parser {
         Gson gson = gsonBuilder.create();
         return gson.toJson(list, listType);
     }
+
     public static String objToJson(User obj) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setPrettyPrinting();
         Gson gson = gsonBuilder.create();
         return gson.toJson(obj, obj.getClass());
     }
+
     public static void writeString(String string, String name) {
         try (FileWriter fileWriter = new FileWriter(name)) {
             fileWriter.write(string);
@@ -57,6 +60,7 @@ public class Parser {
             e.printStackTrace();
         }
     }
+
 
     public static String readString(String fileName) throws RuntimeException {
         StringBuilder stringBuilder = new StringBuilder();

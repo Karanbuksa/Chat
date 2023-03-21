@@ -1,4 +1,4 @@
-package server;
+package server.tasks;
 
 import java.util.Objects;
 
@@ -9,6 +9,22 @@ public class User {
     private String username;
     private String password;
     private String email;
+
+
+    public User() {
+    }
+
+    public User(Long age, String name, String surname, String username, String password, String email) {
+        this.age = age;
+        this.name = name;
+        this.surname = surname;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
+
+
 
     @Override
     public String toString() {
@@ -35,63 +51,51 @@ public class User {
         return Objects.hash(age, name, surname, username, password, email);
     }
 
-    public User() {
-    }
-
-    public User(Long age, String name, String surname, String username, String password, String email) {
-        this.age = age;
-        this.name = name;
-        this.surname = surname;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }
-
-    public Long getAge() {
+    protected Long getAge() {
         return age;
     }
 
-    public void setAge(Long age) {
+    protected void setAge(Long age) {
         this.age = age;
     }
 
-    public String getName() {
+    protected String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    protected void setName(String name) {
         this.name = name;
     }
 
-    public String getSurname() {
+    protected String getSurname() {
         return surname;
     }
 
-    public void setSurname(String surname) {
+    protected void setSurname(String surname) {
         this.surname = surname;
     }
 
-    public String getUsername() {
+    protected String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    protected void setUsername(String username) {
         this.username = username;
     }
 
-    public String getPassword() {
+    protected String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    protected void setPassword(String password) {
         this.password = password;
     }
 
-    public String getEmail() {
+    protected String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    protected void setEmail(String email) {
         this.email = email;
     }
 }

@@ -1,172 +1,42 @@
 package server;
 
+import server.tasks.AcceptingConnectionRunnable;
+import server.tasks.ProcessingConnectionRunnable;
+import server.tasks.User;
+import server.tasks.chatRunnable;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
-import static server.Parser.*;
-import static server.Parser.listToJson;
-import static server.TokenService.generateToken;
-
+import static server.Parser.jsonToList;
+import static server.Parser.readString;
 
 public class Server {
-    private static final Logger logger = LogManager.getLogger(Server.class);
-    private static final BlockingQueue<Socket> bq = new ArrayBlockingQueue<>(100);
-//    private static final BlockingQueue<BufferedReader> ins = new ArrayBlockingQueue<>(100);
-//    private static final BlockingQueue<PrintWriter> outs = new ArrayBlockingQueue<>(100);
-    private static final List<User> users = new ArrayList<>();
-
+    private static final BlockingQueue<BufferedReader> ins0 = new ArrayBlockingQueue<>(100);
+    private static final BlockingQueue<PrintWriter> outs0 = new ArrayBlockingQueue<>(100);
+    private static final ConcurrentHashMap<String, BufferedReader> ins1 = new ConcurrentHashMap<>(100);
+    private static final ConcurrentHashMap<String, PrintWriter> outs1 = new ConcurrentHashMap<>(100);
+    protected static List<User> users = new ArrayList<>();
 
     public static void main(String[] args) {
-        users.addAll(jsonToList(readString("src/main/java/server/user.json")));
-        List<Thread> acceptingThreads = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            acceptingThreads.add(new Thread(acceptingConnections));
-        }
-        acceptingThreads.forEach(Thread::start);
-        List<Thread> processingThreads = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            processingThreads.add(new Thread(processingConnection));
-            processingThreads.forEach(Thread::start);
-        }
-    }
+        users.addAll(jsonToList(readString("src/main/java/server/users.json")));
+        try (ThreadPoolExecutor executor = new ThreadPoolExecutor(
+                7,
+                7,
+                5000,
+                TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<>(100)
+        )) {
+            executor.allowCoreThreadTimeOut(true);
 
-    private static int checkPort() {
-        try (BufferedReader br = new BufferedReader(new FileReader("src/main/java/server/settings.txt"))) {
-            String str = br.readLine();
-            String[] strs = str.split(" = ");
-            return Integer.parseInt(strs[1]);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    private static final Runnable processingConnection = () -> {
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
-                Socket clientSocket = bq.take();
-                try (OutputStream clientOutputStream = clientSocket.getOutputStream();
-                     InputStream clientInputStream = clientSocket.getInputStream()
-                ) {
-                    PrintWriter out = new PrintWriter(clientOutputStream, true);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(clientInputStream));
-                    String token = in.readLine();
-                    if (token == null) {
-                        User user = new User();
-                        boolean f = true;
-                        while (f) {
-                            out.println("1. Войти      2.Зарегистрироваться");
-                            switch (in.readLine()) {
-                                case "1" -> {
-                                    if (signIn(out, in, user)) {
-                                        f = false;
-                                    }
-                                }
-                                case "2" -> {
-                                    signUp(out, in, user);
-                                    f = false;
-                                }
-                            }
-                        }
-                        out.print(generateToken(user.getUsername()));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            executor.submit(new AcceptingConnectionRunnable(ins0, outs0));
+            for (int i = 0; i < 5; i++) {
+                executor.submit(new ProcessingConnectionRunnable(ins0, outs0, ins1, outs1, users));
             }
+            executor.submit(new chatRunnable(ins1, outs1));
         }
-    };
-
-    private static final Runnable acceptingConnections = () -> {
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
-                bq.put(Objects.requireNonNull(acceptConnection(checkPort())));
-                logger.info("New connection accepted");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
-    private static Socket acceptConnection(int port) {
-        try (ServerSocket ss = new ServerSocket(port)) {
-            return ss.accept();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static boolean signIn(PrintWriter out, BufferedReader in, User found) throws IOException {
-        boolean accepted = false;
-        out.println("Введите почту или логин");
-        String usernameOrEmail = in.readLine();
-        out.println("Введите пароль");
-        String password = in.readLine();
-        List<User> foundUsers = users.stream()
-                .filter(x -> x.getEmail().equals(usernameOrEmail) ||
-                        x.getUsername().equals(usernameOrEmail)).toList();
-        if (foundUsers.isEmpty()) {
-            out.println("Такой пользователь не зарегистирован. Нажмите Enter, чтобы продолжить.");
-            in.readLine();
-        } else if (!Objects.equals(password, foundUsers.get(0).getPassword())) {
-            out.println("Неверный пароль. Нажмите Enter, чтобы продолжить.");
-            in.readLine();
-        } else {
-            out.println("Добро пожаловать, " + foundUsers.get(0).getName() + ". Нажмите Enter, чтобы продолжить.");
-            in.readLine();
-            accepted = true;
-        }
-        found = foundUsers.get(0);
-        return accepted;
-    }
-
-    private static void signUp(PrintWriter out, BufferedReader in, User user) throws IOException {
-        String nickName = getString(out, in, "ник");
-        String email = getString(out, in, "адрес");
-        out.println("Введите пароль");
-        String password = in.readLine();
-        out.println("Введите возраст");
-        Long age = Long.parseLong(in.readLine());
-        out.println("Введите имя");
-        String name = in.readLine();
-        out.println("Введите фамилию");
-        String surname = in.readLine();
-        user.setUsername(nickName);
-        user.setAge(age);
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setSurname(surname);
-        users.add(user);
-        writeString(listToJson(users), "users.json");
-        out.println("Вы зарегистрированы. Нажмите Enter, чтобы продолжить.");
-        in.readLine();
-    }
-
-    private static String getString(PrintWriter out, BufferedReader in, String str) throws IOException {
-        String value = null;
-        boolean correct = false;
-        while (!correct) {
-            out.println("Введите " + str);
-            value = in.readLine();
-            String finalValue = value;
-            if (!users.stream().filter(x -> x.getUsername().equals(finalValue)).toList().isEmpty()) {
-                out.println("Пользователь с таким " + str + "ом уже существует");
-            } else {
-                correct = true;
-            }
-        }
-        return value;
     }
 }

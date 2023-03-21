@@ -1,0 +1,26 @@
+[
+  {
+    "age": 17,
+    "name": "John",
+    "surname": "Smith",
+    "username": "test",
+    "password": "hotguyxxx",
+    "email": "test@mail.com"
+  },
+  {
+    "age": 15,
+    "name": "sfdhdfghd",
+    "surname": "sfghdgj",
+    "username": "Karanbuksa",
+    "password": "dfghdfghdfg",
+    "email": "ghdfghdfgh"
+  },
+  {
+    "age": 15,
+    "name": "sdkfbgjklgb",
+    "surname": "gkbkfnbg",
+    "username": "Остап Бендер",
+    "password": "skfgjhskfgjhl",
+    "email": "ksjfghklfjgh"
+  }
+]
