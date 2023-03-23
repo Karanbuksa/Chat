@@ -1,5 +1,4 @@
 {
   "port": 8656,
-  "host": "127.0.0.1",
-  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJrc2pmZ2hrbGZqZ2gifQ.Jwu6gXWGVaZXH05oea87Gt6WgsORYmuQpc8leaSVFvUrQACWp9Yfe4T4iuCTQMEtjR69E-3hE24tSFk6N-qEfQ"
+  "host": "127.0.0.1"
 }

@@ -1,11 +1,9 @@
 package server;
 
-import server.tasks.AcceptingConnectionRunnable;
-import server.tasks.ProcessingConnectionRunnable;
-import server.tasks.User;
-import server.tasks.chatRunnable;
+import server.tasks.*;
 
 import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,14 +22,14 @@ public class Server {
     public static void main(String[] args) {
         users.addAll(jsonToList(readString("src/main/java/server/users.json")));
         try (ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                7,
-                7,
+                8,
+                8,
                 5000,
                 TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(100)
         )) {
             executor.allowCoreThreadTimeOut(true);
-
+            ins1.put("Server", new BufferedReader(new InputStreamReader(System.in)));
             executor.submit(new AcceptingConnectionRunnable(ins0, outs0));
             for (int i = 0; i < 5; i++) {
                 executor.submit(new ProcessingConnectionRunnable(ins0, outs0, ins1, outs1, users));

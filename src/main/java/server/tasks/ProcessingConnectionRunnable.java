@@ -72,7 +72,7 @@ public class ProcessingConnectionRunnable implements Runnable {
                                 f = false;
                             }
                             case "3" -> {
-                                out.println("/exit");
+                                out.println("/stop");
                                 out.close();
                                 in.close();
                             }

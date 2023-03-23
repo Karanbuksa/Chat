@@ -25,10 +25,8 @@ public class EnteringChat implements Runnable {
             BufferedReader clientBufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             Scanner scanner = new Scanner(System.in);
             clientPrintWriter.println(token);
-            processingConnection(clientPrintWriter, clientBufferedReader, scanner);
-            if (!Thread.currentThread().isInterrupted()) {
-                token = clientBufferedReader.readLine();
-                setToken(token, jsonObj);
+            boolean proceed = processingConnection(clientPrintWriter, clientBufferedReader, scanner, jsonObj);
+            if (proceed) {
                 new Thread(new SendingMessagesRunnable(clientBufferedReader, clientPrintWriter, jsonObj, EnteringChat::setToken)).start();
             }
         } catch (IOException e) {
@@ -37,7 +35,8 @@ public class EnteringChat implements Runnable {
     }
 
 
-    private static void processingConnection(PrintWriter clientPrintWriter, BufferedReader clientBufferedReader, Scanner scanner) throws IOException {
+    private static boolean processingConnection(PrintWriter clientPrintWriter, BufferedReader clientBufferedReader, Scanner scanner, JSONObject jsonObj) throws IOException {
+        String token;
         String response;
         String message = null;
         int i = 0;
@@ -51,13 +50,16 @@ public class EnteringChat implements Runnable {
                 System.out.println(response);
                 clientPrintWriter.println(message = scanner.nextLine());
                 response = clientBufferedReader.readLine();
-                if (Objects.equals(message, "/exit")) {
+                if (Objects.equals(message, "/exit") || Objects.equals(response, "/stop")) {
                     clientBufferedReader.close();
                     clientPrintWriter.close();
-                    Thread.currentThread().interrupt();
+                    return false;
                 }
             }
+            token = clientBufferedReader.readLine();
+            setToken(token, jsonObj);
         }
+        return true;
     }
 
     private static JSONObject readingSettings() {
@@ -81,6 +83,7 @@ public class EnteringChat implements Runnable {
         String jsonString = gson.toJson(jsonObj);
         try (FileWriter writer = new FileWriter(System.getProperty("settingsFilePath"))) {
             writer.write(jsonString);
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

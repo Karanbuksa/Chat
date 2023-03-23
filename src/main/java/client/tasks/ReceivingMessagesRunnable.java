@@ -44,7 +44,9 @@ public class ReceivingMessagesRunnable implements Runnable {
             while (clientBufferedReader.ready()) {
                 sb.append(clientBufferedReader.readLine()).append("\n");
             }
-            sb.delete(sb.length() - 1, sb.length());
+            if (!sb.isEmpty()) {
+                sb.delete(sb.length() - 1, sb.length());
+            }
             String log = sb.toString();
             try {
                 bw.write(log);

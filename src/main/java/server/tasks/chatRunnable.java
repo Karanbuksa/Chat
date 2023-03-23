@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +34,7 @@ public class chatRunnable implements Runnable {
 
     @Override
     public void run() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         while (!Thread.currentThread().isInterrupted()) {
             ins.forEach(
                     (sendingNickName, in) -> {
@@ -39,7 +42,7 @@ public class chatRunnable implements Runnable {
                         try {
                             if (in.ready()) {
                                 message = sendingNickName + ": " + in.readLine();
-                                System.out.println(message);
+                                System.out.println(LocalDateTime.now().format(formatter)+ " - " + message);
                                 logger.trace(message);
                                 outs.forEach(
                                         (receivingNickName, printWriter) -> {
@@ -53,7 +56,7 @@ public class chatRunnable implements Runnable {
                                                     e.printStackTrace();
                                                 }
                                             } else if (!Objects.equals(receivingNickName, sendingNickName)) {
-                                                printWriter.println(message);
+                                                printWriter.println(LocalDateTime.now().format(formatter) + " - " + message);
                                             }
                                         }
                                 );
@@ -65,7 +68,7 @@ public class chatRunnable implements Runnable {
             );
             try {
                 Thread.sleep(100);
-            }catch (InterruptedException e){
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }

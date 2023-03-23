@@ -46,7 +46,7 @@ public class AcceptingConnectionRunnable implements Runnable {
     private static Socket acceptConnection(int port) {
         try (ServerSocket ss = new ServerSocket(port)) {
             Socket socket = ss.accept();
-            socket.setKeepAlive(true);
+            System.out.println("New connection accepted");
             return socket;
         } catch (IOException e) {
             e.printStackTrace();
