@@ -36,7 +36,7 @@ public class Server {
             for (int i = 0; i < 5; i++) {
                 executor.submit(new ProcessingConnectionRunnable(ins0, outs0, ins1, outs1, users));
             }
-            executor.submit(new chatRunnable(ins1, outs1));
+            executor.submit(new chatRunnable(ins0, outs0, ins1, outs1));
         }
     }
 }

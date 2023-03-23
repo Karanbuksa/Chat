@@ -7,14 +7,25 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class chatRunnable implements Runnable {
     protected static final Logger logger = LogManager.getLogger(chatRunnable.class);
+    protected static BlockingQueue<BufferedReader> ins0;
+    protected static BlockingQueue<PrintWriter> outs0;
     protected static ConcurrentHashMap<String, BufferedReader> ins;
     protected static ConcurrentHashMap<String, PrintWriter> outs;
 
-    public chatRunnable(ConcurrentHashMap<String, BufferedReader> ins, ConcurrentHashMap<String, PrintWriter> outs) {
+    public chatRunnable(
+            BlockingQueue<BufferedReader> ins0,
+            BlockingQueue<PrintWriter> outs0,
+            ConcurrentHashMap<String, BufferedReader> ins,
+            ConcurrentHashMap<String, PrintWriter> outs
+
+    ) {
+        chatRunnable.ins0 = ins0;
+        chatRunnable.outs0 = outs0;
         chatRunnable.ins = ins;
         chatRunnable.outs = outs;
     }
@@ -32,8 +43,18 @@ public class chatRunnable implements Runnable {
                                 logger.trace(message);
                                 outs.forEach(
                                         (receivingNickName, printWriter) -> {
-                                            if (!Objects.equals(receivingNickName, sendingNickName))
+                                            if (Objects.equals(message, "/sign out")) {
+                                                try {
+                                                    ins0.put(in);
+                                                    outs0.put(printWriter);
+                                                    ins.remove(sendingNickName);
+                                                    outs.remove(sendingNickName);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            } else if (!Objects.equals(receivingNickName, sendingNickName)) {
                                                 printWriter.println(message);
+                                            }
                                         }
                                 );
                             }
@@ -42,6 +63,11 @@ public class chatRunnable implements Runnable {
                         }
                     }
             );
+            try {
+                Thread.sleep(100);
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
         }
     }
 }

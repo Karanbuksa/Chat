@@ -2,10 +2,7 @@ package server.tasks;
 
 import io.jsonwebtoken.Claims;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +43,6 @@ public class ProcessingConnectionRunnable implements Runnable {
             try {
                 PrintWriter out = outs0.take();
                 BufferedReader in = ins0.take();
-                out.println("connected");
                 String token = in.readLine();
                 List<User> userList = new ArrayList<>();
                 if (!token.equals("null")) {
@@ -68,22 +64,22 @@ public class ProcessingConnectionRunnable implements Runnable {
                                 User user;
                                 if ((user = signIn(out, in)) != null) {
                                     f = false;
-                                    //noinspection ConstantConditions
                                     userList.add(user);
                                 }
                             }
                             case "2" -> {
-                                //noinspection ConstantConditions
                                 userList.add(signUp(out, in));
                                 f = false;
                             }
                             case "3" -> {
                                 out.println("/exit");
+                                out.close();
+                                in.close();
                             }
                         }
                     }
                 }
-                out.println(new FileReader("src/main/java/server/log.txt"));
+                sendLog(out);
                 ins1.put(userList.get(0).getUsername(), in);
                 outs1.put(userList.get(0).getUsername(), out);
             } catch (IOException | InterruptedException e) {
@@ -91,6 +87,14 @@ public class ProcessingConnectionRunnable implements Runnable {
             }
 
         }
+    }
+
+    private static void sendLog(PrintWriter out) throws FileNotFoundException {
+        StringBuilder sb = new StringBuilder();
+        new BufferedReader(new FileReader("src/main/java/server/log.txt"))
+                .lines()
+                .forEach(x -> sb.append(x).append("\n"));
+        out.println(sb);
     }
 
     private static User signIn(PrintWriter out, BufferedReader in) throws IOException {
