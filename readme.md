@@ -38,5 +38,5 @@
 <code>Add VM options</code> во вкладке <code>Modify options</code> для каждй 
 конфигурации добавить перемнную <code>-DsettingsFilePath</code>, в которую 
 записать путь к файлу натроек. Файл настроек - файл типа JSON, в него записывается
-один объект с трёмя полями: "port", "host" и "token".
+один объект с трёмя полями: "port", "host" и "token". По умолчанию файл настроек - <code>settings.json</code>
 </p>
