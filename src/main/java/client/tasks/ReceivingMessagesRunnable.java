@@ -62,7 +62,7 @@ public class ReceivingMessagesRunnable implements Runnable {
 
     private void log(String message, BufferedWriter bw) {
         try {
-            bw.write(message);
+            bw.write(message + "\n");
             bw.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);

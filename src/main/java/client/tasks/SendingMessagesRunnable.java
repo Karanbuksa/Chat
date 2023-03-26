@@ -3,6 +3,8 @@ package client.tasks;
 import org.json.simple.JSONObject;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.function.BiConsumer;
@@ -43,7 +45,7 @@ public class SendingMessagesRunnable implements Runnable {
 
     private void log(String message, BufferedWriter bw) {
         try {
-            bw.write(message);
+            bw.write(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) + " - " + message + "\n");
             bw.flush();
         } catch (IOException e) {
             e.printStackTrace();
