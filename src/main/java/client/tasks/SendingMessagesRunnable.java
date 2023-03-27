@@ -31,8 +31,9 @@ public class SendingMessagesRunnable implements Runnable {
         receivingMessagesThread.start();
         String message = scanner.nextLine();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/main/java/client/log.txt", true))) {
-            while (!Thread.currentThread().isInterrupted() || Objects.equals(message, "/exit")) {
+            while (!Thread.currentThread().isInterrupted()) {
                 if (signOut(message, receivingMessagesThread)) break;
+                if (exit(message, receivingMessagesThread)) break;
                 out.println(message);
                 log(message, bw);
                 message = scanner.nextLine();
@@ -50,6 +51,21 @@ public class SendingMessagesRunnable implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean exit(String message, Thread receivingMessagesThread) {
+        if (Objects.equals(message, "/exit")) {
+            receivingMessagesThread.interrupt();
+            out.close();
+            try {
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+            return true;
+        }
+        return false;
     }
 
     private boolean signOut(String message, Thread receivingMessagesThread) {

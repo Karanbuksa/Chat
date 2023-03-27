@@ -2,3 +2,13 @@
 24-03-2023 01:30:15 - test: dsfhdfgjghj
 24-03-2023 01:30:20 - Остап Бендер: fdgdfghdghj
 24-03-2023 01:30:34 - Server: sfgdghjjk
+26-03-2023 14:17:18 - test: dghfjfghj
+26-03-2023 14:17:35 - Bender Rodriges: fhjkghjk
+26-03-2023 14:20:55 - test: hgjfhjgf
+26-03-2023 14:21:14 - Bender Rodriges: jkhgghfhgf
+26-03-2023 14:24:11 - Bender Rodriges: dfghdghj
+27-03-2023 20:34:58 - Bender Rodriges: dfghdfgh
+27-03-2023 20:35:02 - test: fghjfghj
+27-03-2023 20:35:15 - test: /exit
+27-03-2023 20:40:36 - test: /exit
+27-03-2023 20:41:19 - test: /exit

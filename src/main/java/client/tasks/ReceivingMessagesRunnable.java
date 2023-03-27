@@ -20,7 +20,7 @@ public class ReceivingMessagesRunnable implements Runnable {
             if (!log.isEmpty()) {
                 System.out.print(log);
             }
-            System.out.println("Добро пожаловать в чат!\nЧтобы выйти из учётной записи введите \"/sign out\"");
+            System.out.println("Добро пожаловать в чат!\nЧтобы выйти из учётной записи введите \"/sign out\"\nЧтобы выйти из приложения введите \"/exit\"");
             String message;
             while (!Thread.currentThread().isInterrupted()) {
                 try {
